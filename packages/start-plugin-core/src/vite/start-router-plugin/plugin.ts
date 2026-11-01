@@ -6,6 +6,7 @@ import {
 import path from 'pathe'
 import { normalizePath } from 'vite'
 import { VITE_ENVIRONMENT_NAMES } from '../../constants'
+import { escapeRegExp } from '../../utils'
 import { routesManifestPlugin } from '../../start-router-plugin/generator-plugins/routes-manifest-plugin'
 import { prerenderRoutesPlugin } from '../../start-router-plugin/generator-plugins/prerender-routes-plugin'
 import { buildRouteTreeFileFooterFromConfig } from '../../start-router-plugin/route-tree-footer'
@@ -105,7 +106,9 @@ export function tanStackStartRouter(
         getGeneratedRouteTreePath(),
       )
       ;(clientTreePlugin.load as LoadObjectHook).filter = {
-        id: { include: new RegExp(resolvedGeneratedRouteTreePath) },
+        id: {
+          include: new RegExp(escapeRegExp(resolvedGeneratedRouteTreePath)),
+        },
       }
     },
 
