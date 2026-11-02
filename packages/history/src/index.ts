@@ -202,6 +202,11 @@ export function createHistory(opts: {
       state = assignKeyAndIndex(currentIndex + 1, state)
       tryNavigation({
         task: () => {
+          // `location` may have advanced while blockers were awaited
+          state = {
+            ...state,
+            [stateIndexKey]: location.state[stateIndexKey] + 1,
+          }
           opts.pushState(path, state)
           notify({ type: 'PUSH' })
         },
@@ -216,6 +221,7 @@ export function createHistory(opts: {
       state = assignKeyAndIndex(currentIndex, state)
       tryNavigation({
         task: () => {
+          state = { ...state, [stateIndexKey]: location.state[stateIndexKey] }
           opts.replaceState(path, state)
           notify({ type: 'REPLACE' })
         },

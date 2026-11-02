@@ -156,6 +156,30 @@ describe('createMemoryHistory', () => {
     expect((history.location.state as any).i).toBe(3)
   })
 
+  test('navigations made while blockers are pending are indexed in order', async () => {
+    const history = createMemoryHistory({ initialEntries: ['/list'] })
+    const unblock = history.block({
+      blockerFn: async () => false,
+      enableBeforeUnload: false,
+    })
+
+    history.push('/record')
+    history.replace('/record/letters')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(history.location.pathname).toBe('/record/letters')
+    expect(history.location.state.__TSR_index).toBe(1)
+    expect(history.canGoBack()).toBe(true)
+
+    history.push('/a')
+    history.push('/b')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(history.location.state.__TSR_index).toBe(3)
+
+    unblock()
+  })
+
   test('block prevents navigation', async () => {
     const history = createMemoryHistory({ initialEntries: ['/'] })
     const blockerFn = vi.fn(() => true) // Always block
